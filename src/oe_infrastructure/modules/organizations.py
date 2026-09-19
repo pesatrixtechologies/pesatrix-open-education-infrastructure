@@ -25,7 +25,9 @@ class Organization(Base, UUIDPrimaryKeyMixin, CodeMixin, TimestampMixin):
     parent_organization_id: Mapped[Any | None] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("organizations.id"), nullable=True
     )
-    attributes: Mapped[dict[str, Any]] = mapped_column(JSON, name="metadata", nullable=False, default=dict)
+    attributes: Mapped[dict[str, Any]] = mapped_column(
+        JSON, name="metadata", nullable=False, default=dict
+    )
 
     schools = relationship("School", back_populates="organization")
     children = relationship("Organization")
@@ -42,7 +44,9 @@ class School(Base, UUIDPrimaryKeyMixin, CodeMixin, TimestampMixin):
     )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     status: Mapped[str] = mapped_column(String(24), nullable=False, default="active")
-    attributes: Mapped[dict[str, Any]] = mapped_column(JSON, name="metadata", nullable=False, default=dict)
+    attributes: Mapped[dict[str, Any]] = mapped_column(
+        JSON, name="metadata", nullable=False, default=dict
+    )
 
     organization = relationship("Organization", back_populates="schools")
 

@@ -7,12 +7,12 @@ be unit-tested without a database.
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, time, timezone
+from datetime import UTC, date, datetime, time
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from oe_infrastructure.core.errors import NotFoundError, ValidationFailure
+from oe_infrastructure.core.errors import ValidationFailure
 from oe_infrastructure.modules.attendance import AttendanceRecord
 from oe_infrastructure.modules.enums import AttendanceStatus, EventKind
 from oe_infrastructure.modules.events import EducationalEvent
@@ -32,16 +32,16 @@ def derive_status(
     if override is not None:
         try:
             return AttendanceStatus(override)
-        except ValueError:
+        except ValueError as err:
             raise ValidationFailure(
                 f"Invalid override status '{override}'",
                 code="invalid_status",
-            )
+            ) from err
     if not check_ins:
         return AttendanceStatus.UNRECORDED
     latest = max(check_ins)
     if latest.tzinfo is None:
-        latest = latest.replace(tzinfo=timezone.utc)
+        latest = latest.replace(tzinfo=UTC)
     if latest.time() < late_threshold:
         return AttendanceStatus.PRESENT
     return AttendanceStatus.LATE
@@ -64,7 +64,8 @@ async def rollup_attendance(
             if evt.event_kind == EventKind.CHECK_IN.value
         ]
         overrides = [
-            evt for evt in events[student.id]
+            evt
+            for evt in events[student.id]
             if evt.event_kind == EventKind.ATTENDANCE_OVERRIDE.value
         ]
 
@@ -95,13 +96,13 @@ async def rollup_attendance(
                 date=day,
                 status=status.value,
                 source_event_id=source_event_id,
-                derived_at=datetime.now(timezone.utc),
+                derived_at=datetime.now(UTC),
             )
             session.add(record)
         else:
             record.status = status.value
             record.source_event_id = source_event_id
-            record.derived_at = datetime.now(timezone.utc)
+            record.derived_at = datetime.now(UTC)
         records.append(record)
 
     return records
@@ -125,8 +126,8 @@ async def _events_for_day(
     school_id: uuid.UUID,
     day: date,
 ) -> dict[uuid.UUID, list[EducationalEvent]]:
-    start = datetime.combine(day, time.min, tzinfo=timezone.utc)
-    end = datetime.combine(day, time.max, tzinfo=timezone.utc)
+    start = datetime.combine(day, time.min, tzinfo=UTC)
+    end = datetime.combine(day, time.max, tzinfo=UTC)
     result = await session.execute(
         select(EducationalEvent).where(
             EducationalEvent.school_id == school_id,
@@ -160,9 +161,7 @@ async def list_attendance(
         count_query = count_query.where(AttendanceRecord.date == day)
     if student_identity_id is not None:
         query = query.where(AttendanceRecord.student_identity_id == student_identity_id)
-        count_query = count_query.where(
-            AttendanceRecord.student_identity_id == student_identity_id
-        )
+        count_query = count_query.where(AttendanceRecord.student_identity_id == student_identity_id)
     total = await session.scalar(count_query) or 0
     result = await session.execute(
         query.order_by(AttendanceRecord.date.desc()).offset((page - 1) * size).limit(size)

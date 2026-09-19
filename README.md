@@ -85,7 +85,7 @@ See [`docs/architecture/overview.md`](docs/architecture/overview.md) for details
 
 ```bash
 # 1. Clone
-git clone https://github.com/pesatrix/pesatrix-open-education-infrastructure.git
+git clone https://github.com/pesatrixtechologies/pesatrix-open-education-infrastructure.git
 cd pesatrix-open-education-infrastructure
 
 # 2. Configure

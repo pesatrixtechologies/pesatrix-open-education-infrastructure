@@ -1,4 +1,4 @@
-﻿"""Educational event routes."""
+"""Educational event routes."""
 
 from __future__ import annotations
 
@@ -7,14 +7,12 @@ import uuid
 from fastapi import APIRouter, Depends, Request
 
 from oe_infrastructure.core.deps import SessionDep, UserDep, require_role_at_least
-from oe_infrastructure.core.errors import ConflictError
 from oe_infrastructure.core.rate_limit import rate_limit
 from oe_infrastructure.core.security import Role
 from oe_infrastructure.modules.enums import EventKind
 from oe_infrastructure.schemas.schemas import (
     EducationalEventCreate,
     EducationalEventResponse,
-    MessageResponse,
     PaginatedEvent,
 )
 from oe_infrastructure.services.audit import audit

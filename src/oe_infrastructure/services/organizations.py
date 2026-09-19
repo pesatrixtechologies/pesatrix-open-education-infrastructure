@@ -49,7 +49,10 @@ async def list_organizations(
 ) -> tuple[list[Organization], int]:
     total = await session.scalar(select(func.count()).select_from(Organization)) or 0
     result = await session.execute(
-        select(Organization).order_by(Organization.created_at.asc()).offset((page - 1) * size).limit(size)
+        select(Organization)
+        .order_by(Organization.created_at.asc())
+        .offset((page - 1) * size)
+        .limit(size)
     )
     return list(result.scalars().all()), total
 
@@ -67,9 +70,7 @@ async def update_organization(
 
 async def create_school(session: AsyncSession, payload: SchoolCreate) -> School:
     await get_organization(session, payload.organization_id)
-    existing = await session.execute(
-        select(School.code).where(School.code == payload.code)
-    )
+    existing = await session.execute(select(School.code).where(School.code == payload.code))
     if existing.scalar_one_or_none() is not None:
         raise ConflictError(f"School code '{payload.code}' already exists")
     school = School(

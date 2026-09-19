@@ -13,6 +13,16 @@ from sqlalchemy.ext.asyncio import (
 
 from oe_infrastructure.config import get_settings
 
+__all__ = [
+    "AsyncSession",
+    "SessionLocal",
+    "dispose_engine",
+    "engine",
+    "get_session",
+    "init_schema",
+    "make_session",
+]
+
 
 def _build_engine() -> AsyncEngine:
     settings = get_settings()
@@ -55,7 +65,6 @@ async def init_schema() -> None:
     """
     # Importing the module registers all models on ``Base.metadata``.
     import oe_infrastructure.modules  # noqa: F401
-
     from oe_infrastructure.modules.base import Base
 
     async with engine.begin() as conn:

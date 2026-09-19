@@ -7,7 +7,7 @@ Idempotent ingestion is guaranteed by a unique ``idempotency_key``.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -21,9 +21,9 @@ from oe_infrastructure.schemas.schemas import EducationalEventCreate
 
 async def _normalize_occurred_at(value: datetime | None) -> datetime:
     if value is None:
-        return datetime.now(timezone.utc)
+        return datetime.now(UTC)
     if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
+        return value.replace(tzinfo=UTC)
     return value
 
 
@@ -109,9 +109,7 @@ async def list_events(
         count_query = count_query.where(EducationalEvent.school_id == school_id)
     if student_identity_id is not None:
         query = query.where(EducationalEvent.student_identity_id == student_identity_id)
-        count_query = count_query.where(
-            EducationalEvent.student_identity_id == student_identity_id
-        )
+        count_query = count_query.where(EducationalEvent.student_identity_id == student_identity_id)
     if kind is not None:
         query = query.where(EducationalEvent.event_kind == kind.value)
         count_query = count_query.where(EducationalEvent.event_kind == kind.value)
@@ -120,9 +118,7 @@ async def list_events(
         count_query = count_query.where(EducationalEvent.seq > since_seq)
 
     total = await session.scalar(count_query) or 0
-    result = await session.execute(
-        query.order_by(EducationalEvent.seq.asc()).limit(limit)
-    )
+    result = await session.execute(query.order_by(EducationalEvent.seq.asc()).limit(limit))
     return list(result.scalars().all()), total
 
 

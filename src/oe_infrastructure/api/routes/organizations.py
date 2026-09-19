@@ -1,4 +1,4 @@
-﻿"""Organization and school routes."""
+"""Organization and school routes."""
 
 from __future__ import annotations
 

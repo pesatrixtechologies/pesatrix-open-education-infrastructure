@@ -42,6 +42,15 @@ alembic upgrade head
 pytest
 ```
 
+Integration tests require PostgreSQL. By default they use
+`postgresql+asyncpg://oe:oe@localhost:5432/oe_test`; override with
+`OE_TEST_DATABASE_URL`. Tests are automatically skipped if no database is
+reachable. Create the test database once:
+
+```bash
+createdb -U oe oe_test        # or: psql -U oe -c "CREATE DATABASE oe_test"
+```
+
 ## Code style
 
 We use `ruff` for linting and formatting:

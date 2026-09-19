@@ -1,4 +1,4 @@
-﻿"""Credential routes."""
+"""Credential routes."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from oe_infrastructure.core.deps import SessionDep, UserDep, require_role_at_lea
 from oe_infrastructure.core.errors import NotFoundError
 from oe_infrastructure.core.rate_limit import rate_limit
 from oe_infrastructure.core.security import Role
+from oe_infrastructure.modules.organizations import Organization
 from oe_infrastructure.schemas.schemas import (
     CredentialCreate,
     CredentialResponse,
@@ -22,14 +23,13 @@ from oe_infrastructure.schemas.schemas import (
 )
 from oe_infrastructure.services.audit import audit
 from oe_infrastructure.services.credentials import (
+    build_qr_payload,
     get_credential,
     issue_credential,
     list_credentials,
     revoke_credential,
     verify_credential,
-    build_qr_payload,
 )
-from oe_infrastructure.modules.organizations import Organization
 
 router = APIRouter()
 

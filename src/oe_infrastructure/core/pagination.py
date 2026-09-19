@@ -24,7 +24,7 @@ class Page(BaseModel, Generic[T]):
         total: int,
         page: int,
         size: int,
-    ) -> "Page[T]":
+    ) -> Page[T]:
         return cls(
             items=list(items),
             total=total,

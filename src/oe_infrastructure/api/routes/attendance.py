@@ -101,11 +101,14 @@ async def summary(
         for record in records:
             counts[record.status] = counts.get(record.status, 0) + 1
 
-    total_students = await session.scalar(
-        select(func.count())
-        .select_from(StudentIdentity)
-        .where(StudentIdentity.school_id == school_id, StudentIdentity.status == "active")
-    ) or 0
+    total_students = (
+        await session.scalar(
+            select(func.count())
+            .select_from(StudentIdentity)
+            .where(StudentIdentity.school_id == school_id, StudentIdentity.status == "active")
+        )
+        or 0
+    )
     day_label = day.isoformat() if day else "all"
 
     return AttendanceSummaryResponse(

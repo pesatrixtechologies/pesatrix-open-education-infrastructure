@@ -14,7 +14,8 @@ Devices register against a school, then:
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -52,7 +53,7 @@ async def get_device(session: AsyncSession, device_id: uuid.UUID) -> SyncDevice:
 
 
 async def touch_device(session: AsyncSession, device: SyncDevice) -> None:
-    device.last_seen_at = datetime.now(timezone.utc)
+    device.last_seen_at = datetime.now(UTC)
 
 
 async def upload_events(
@@ -62,7 +63,7 @@ async def upload_events(
     batch_seq: int,
     records: list[SyncUploadRecord],
     received: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Ingest a device upload batch.
 
     Returns a result dict::
@@ -91,7 +92,7 @@ async def upload_events(
 
     accepted = 0
     duplicates = 0
-    failed: list[dict] = []
+    failed: list[dict[str, Any]] = []
 
     for record in records:
         event_payload = EducationalEventCreate(
@@ -105,12 +106,12 @@ async def upload_events(
             payload=record.payload,
         )
         try:
-            _, created = await record_event(
-                session,
-                event_payload,
-            )
+            async with session.begin_nested():
+                _, created = await record_event(
+                    session,
+                    event_payload,
+                )
         except Exception as exc:  # noqa: BLE001 — record-level isolation
-            session.rollback()
             failed.append(
                 {
                     "idempotency_key": record.idempotency_key,
@@ -127,7 +128,7 @@ async def upload_events(
     batch.status = BatchStatus.COMPLETED.value
     batch.event_count = accepted + duplicates
     batch.watermark_after = watermark
-    batch.processed_at = datetime.now(timezone.utc)
+    batch.processed_at = datetime.now(UTC)
     await session.flush()
     return {
         "accepted": accepted,
@@ -172,7 +173,7 @@ async def download_events(
         batch_seq=0,
         event_count=len(events),
         watermark_after=events[-1].seq if events else since_seq,
-        processed_at=datetime.now(timezone.utc),
+        processed_at=datetime.now(UTC),
     )
     session.add(batch)
     return events, more

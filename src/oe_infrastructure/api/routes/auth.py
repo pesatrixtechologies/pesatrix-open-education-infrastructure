@@ -1,14 +1,13 @@
-﻿"""Authentication routes."""
+"""Authentication routes."""
 
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasic
 
-from oe_infrastructure import __version__
 from oe_infrastructure.core.deps import ClaimsDep, SessionDep
 from oe_infrastructure.core.rate_limit import rate_limit
-from oe_infrastructure.core.security import TOKEN_TYPE_ACCESS, TokenClaims
+from oe_infrastructure.core.security import TOKEN_TYPE_ACCESS
 from oe_infrastructure.schemas.schemas import (
     AuthTokenRequest,
     AuthTokenResponse,

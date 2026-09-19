@@ -5,17 +5,17 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Uuid
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Boolean, DateTime, String, Uuid
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import JSON
 
+from oe_infrastructure.core.security import Role
 from oe_infrastructure.modules.base import (
     Base,
     TimestampMixin,
     UUIDPrimaryKeyMixin,
 )
 from oe_infrastructure.modules.enums import RecordStatus
-from oe_infrastructure.core.security import Role
 
 
 class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):

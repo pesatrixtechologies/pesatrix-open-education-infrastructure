@@ -1,4 +1,4 @@
-﻿"""Authentication and authorization (JWT + role-based access control).
+"""Authentication and authorization (JWT + role-based access control).
 
 Roles (least-privilege):
 

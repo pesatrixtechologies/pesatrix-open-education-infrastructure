@@ -14,7 +14,7 @@ from oe_infrastructure import __version__
 from oe_infrastructure.api import api_router
 from oe_infrastructure.config import get_settings
 from oe_infrastructure.core.errors import AppError
-from oe_infrastructure.database import dispose_engine, SessionLocal
+from oe_infrastructure.database import SessionLocal, dispose_engine
 from oe_infrastructure.services.bootstrap import bootstrap_admin
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list() or ["*"],
-        allow_credentials=not (settings.cors_origin_list() == []),
+        allow_credentials=settings.cors_origin_list() != [],
         allow_methods=["*"],
         allow_headers=["*"],
     )

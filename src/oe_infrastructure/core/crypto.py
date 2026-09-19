@@ -14,7 +14,7 @@ import hashlib
 import hmac
 from typing import Any
 
-from sqlalchemy import TypeDecorator, String
+from sqlalchemy import String, TypeDecorator
 
 
 def hmac_sha256_hex(key: bytes, message: bytes) -> str:
@@ -25,6 +25,10 @@ def hmac_sha256_hex(key: bytes, message: bytes) -> str:
 
 def constant_time_equals(a: str | bytes, b: str | bytes) -> bool:
     """Compare two values in constant time."""
+    if isinstance(a, str):
+        a = a.encode("utf-8")
+    if isinstance(b, str):
+        b = b.encode("utf-8")
     return hmac.compare_digest(a, b)
 
 

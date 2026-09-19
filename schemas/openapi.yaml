@@ -1,0 +1,2357 @@
+openapi: 3.1.0
+info:
+  title: PESATRIX Open Education Infrastructure API
+  description: Reusable, secure, interoperable digital infrastructure for structured
+    educational events and information in low-resource environments. No personal data
+    is stored by this system.
+  version: 0.1.0
+paths:
+  /:
+    get:
+      summary: Root
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+                title: Response Root  Get
+  /api/v1/health:
+    get:
+      tags:
+      - health
+      - health
+      summary: Health
+      description: Liveness probe. Reports service and database status.
+      operationId: health_api_v1_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/v1/auth/token:
+    post:
+      tags:
+      - auth
+      summary: Exchange credentials for access and refresh tokens
+      operationId: token_api_v1_auth_token_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthTokenRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/refresh:
+    post:
+      tags:
+      - auth
+      summary: Rotate an access token using a refresh token
+      operationId: refresh_token_api_v1_auth_refresh_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - auth
+      summary: Revoke a session (blacklist the token id)
+      operationId: logout_current_api_v1_auth_logout_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+  /api/v1/users:
+    post:
+      tags:
+      - users
+      summary: Create a user (admin)
+      operationId: create_api_v1_users_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - users
+      summary: List users (admin)
+      operationId: list_users_api_v1_users_get
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_UserResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/organizations:
+    post:
+      tags:
+      - organizations
+      summary: Create an organization
+      operationId: create_org_api_v1_organizations_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - organizations
+      summary: List organizations
+      operationId: list_orgs_api_v1_organizations_get
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_OrganizationResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/organizations/{organization_id}:
+    get:
+      tags:
+      - organizations
+      summary: Get an organization
+      operationId: get_org_api_v1_organizations__organization_id__get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Organization Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - organizations
+      summary: Update an organization (admin)
+      operationId: update_org_api_v1_organizations__organization_id__patch
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Organization Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/organizations/{organization_id}/schools:
+    post:
+      tags:
+      - organizations
+      summary: Create a school under an organization
+      operationId: create_school_route_api_v1_organizations__organization_id__schools_post
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Organization Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchoolCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchoolResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - organizations
+      summary: List schools in an organization
+      operationId: list_schools_route_api_v1_organizations__organization_id__schools_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Organization Id
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_SchoolResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/organizations/schools/{school_id}:
+    get:
+      tags:
+      - organizations
+      summary: Get a school
+      operationId: get_school_route_api_v1_organizations_schools__school_id__get
+      parameters:
+      - name: school_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: School Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchoolResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/identities:
+    post:
+      tags:
+      - identities
+      summary: Create a student identity reference
+      operationId: create_api_v1_identities_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - identities
+      summary: List student identity references
+      operationId: list_identities_route_api_v1_identities_get
+      parameters:
+      - name: school_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: School Id
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_IdentityResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/identities/{identity_id}:
+    get:
+      tags:
+      - identities
+      summary: Get a student identity reference
+      operationId: get_api_v1_identities__identity_id__get
+      parameters:
+      - name: identity_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Identity Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - identities
+      summary: Update a student identity reference (admin)
+      operationId: update_api_v1_identities__identity_id__patch
+      parameters:
+      - name: identity_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Identity Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/credentials:
+    post:
+      tags:
+      - credentials
+      summary: Issue a credential (QR-capable)
+      operationId: issue_api_v1_credentials_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - credentials
+      summary: List credentials
+      operationId: list_credentials_route_api_v1_credentials_get
+      parameters:
+      - name: student_identity_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Student Identity Id
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_CredentialResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/credentials/{credential_id}:
+    get:
+      tags:
+      - credentials
+      summary: Get a credential
+      operationId: get_api_v1_credentials__credential_id__get
+      parameters:
+      - name: credential_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Credential Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/credentials/{credential_id}/revoke:
+    post:
+      tags:
+      - credentials
+      summary: Revoke a credential
+      operationId: revoke_api_v1_credentials__credential_id__revoke_post
+      parameters:
+      - name: credential_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Credential Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialRevoke'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/credentials/{credential_id}/verify:
+    post:
+      tags:
+      - credentials
+      summary: Verify a credential (online)
+      operationId: verify_api_v1_credentials__credential_id__verify_post
+      parameters:
+      - name: credential_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Credential Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialVerifyRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialVerifyResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/credentials/{credential_id}/qr:
+    get:
+      tags:
+      - credentials
+      summary: Render the credential as a QR code (PNG bytes)
+      operationId: qr_png_api_v1_credentials__credential_id__qr_get
+      parameters:
+      - name: credential_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Credential Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/events:
+    post:
+      tags:
+      - events
+      summary: Record an educational event (idempotent)
+      operationId: create_event_api_v1_events_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EducationalEventCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EducationalEventResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - events
+      summary: List educational events
+      operationId: list_events_route_api_v1_events_get
+      parameters:
+      - name: school_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: School Id
+      - name: student_identity_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Student Identity Id
+      - name: event_kind
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/EventKind'
+          - type: 'null'
+          title: Event Kind
+      - name: since_seq
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Since Seq
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_EducationalEventResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/attendance/rollup:
+    post:
+      tags:
+      - attendance
+      summary: Compute (or recompute) attendance records for a school on a date
+      operationId: rollup_api_v1_attendance_rollup_post
+      parameters:
+      - name: school_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: School Id
+      - name: day
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          title: Day
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/attendance:
+    get:
+      tags:
+      - attendance
+      summary: List attendance records
+      operationId: list_records_api_v1_attendance_get
+      parameters:
+      - name: school_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: School Id
+      - name: day
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Day
+      - name: student_identity_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Student Identity Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AttendanceRecordResponse'
+                title: Response List Records Api V1 Attendance Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/attendance/summary:
+    get:
+      tags:
+      - attendance
+      summary: Attendance summary counts for a school on a date
+      operationId: summary_api_v1_attendance_summary_get
+      parameters:
+      - name: school_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: School Id
+      - name: day
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Day
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceSummaryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/sync/devices:
+    post:
+      tags:
+      - sync
+      summary: Register a device for offline sync
+      operationId: register_api_v1_sync_devices_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/sync/upload:
+    post:
+      tags:
+      - sync
+      summary: Upload an offline event batch
+      operationId: upload_api_v1_sync_upload_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncUploadRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncUploadResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/sync/download:
+    post:
+      tags:
+      - sync
+      summary: Download events since a watermark
+      operationId: download_api_v1_sync_download_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncDownloadRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncDownloadResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/audit:
+    get:
+      tags:
+      - audit
+      summary: List audit log entries (admin)
+      operationId: list_audit_api_v1_audit_get
+      parameters:
+      - name: action
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Action
+      - name: resource_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resource Type
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_AuditLogResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AttendanceRecordResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        student_identity_id:
+          type: string
+          format: uuid
+          title: Student Identity Id
+        date:
+          type: string
+          format: date
+          title: Date
+        status:
+          $ref: '#/components/schemas/AttendanceStatus'
+        source_event_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Source Event Id
+        derived_at:
+          type: string
+          format: date-time
+          title: Derived At
+      type: object
+      required:
+      - id
+      - school_id
+      - student_identity_id
+      - date
+      - status
+      - derived_at
+      title: AttendanceRecordResponse
+    AttendanceStatus:
+      type: string
+      enum:
+      - present
+      - late
+      - absent
+      - excused
+      - unrecorded
+      title: AttendanceStatus
+    AttendanceSummaryEntry:
+      properties:
+        date:
+          type: string
+          title: Date
+        present:
+          type: integer
+          title: Present
+        late:
+          type: integer
+          title: Late
+        absent:
+          type: integer
+          title: Absent
+        excused:
+          type: integer
+          title: Excused
+        unrecorded:
+          type: integer
+          title: Unrecorded
+        total:
+          type: integer
+          title: Total
+      type: object
+      required:
+      - date
+      - present
+      - late
+      - absent
+      - excused
+      - unrecorded
+      - total
+      title: AttendanceSummaryEntry
+    AttendanceSummaryResponse:
+      properties:
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        date:
+          type: string
+          title: Date
+        total_students:
+          type: integer
+          title: Total Students
+        entries:
+          items:
+            $ref: '#/components/schemas/AttendanceSummaryEntry'
+          type: array
+          title: Entries
+      type: object
+      required:
+      - school_id
+      - date
+      - total_students
+      - entries
+      title: AttendanceSummaryResponse
+    AuditLogResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        actor_type:
+          type: string
+          title: Actor Type
+        actor_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Actor Id
+        action:
+          type: string
+          title: Action
+        resource_type:
+          type: string
+          title: Resource Type
+        resource_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resource Id
+        organization_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Organization Id
+        school_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: School Id
+        request_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Request Id
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - actor_type
+      - action
+      - resource_type
+      title: AuditLogResponse
+    AuthTokenRequest:
+      properties:
+        username:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Username
+        password:
+          type: string
+          maxLength: 256
+          minLength: 1
+          title: Password
+      type: object
+      required:
+      - username
+      - password
+      title: AuthTokenRequest
+    AuthTokenResponse:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        refresh_token:
+          type: string
+          title: Refresh Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+        expires_in:
+          type: integer
+          title: Expires In
+      type: object
+      required:
+      - access_token
+      - refresh_token
+      - expires_in
+      title: AuthTokenResponse
+    CredentialCreate:
+      properties:
+        student_identity_id:
+          type: string
+          format: uuid
+          title: Student Identity Id
+        issuer_organization_id:
+          type: string
+          format: uuid
+          title: Issuer Organization Id
+        credential_type:
+          $ref: '#/components/schemas/CredentialType'
+        title:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Title
+        issued_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Issued At
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+        payload:
+          additionalProperties: true
+          type: object
+          title: Payload
+      type: object
+      required:
+      - student_identity_id
+      - issuer_organization_id
+      - credential_type
+      - title
+      title: CredentialCreate
+    CredentialResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        student_identity_id:
+          type: string
+          format: uuid
+          title: Student Identity Id
+        credential_type:
+          $ref: '#/components/schemas/CredentialType'
+        title:
+          type: string
+          title: Title
+        status:
+          $ref: '#/components/schemas/CredentialStatus'
+        issued_at:
+          type: string
+          format: date-time
+          title: Issued At
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+        issuer_organization_id:
+          type: string
+          format: uuid
+          title: Issuer Organization Id
+        signature:
+          type: string
+          title: Signature
+        revoked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Revoked At
+        revoke_reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revoke Reason
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - student_identity_id
+      - credential_type
+      - title
+      - status
+      - issued_at
+      - issuer_organization_id
+      - signature
+      title: CredentialResponse
+    CredentialRevoke:
+      properties:
+        reason:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Reason
+      type: object
+      required:
+      - reason
+      title: CredentialRevoke
+    CredentialStatus:
+      type: string
+      enum:
+      - issued
+      - revoked
+      - expired
+      title: CredentialStatus
+    CredentialType:
+      type: string
+      enum:
+      - student_id_card
+      - enrolment_certificate
+      - participation
+      - completion
+      - other
+      title: CredentialType
+    CredentialVerifyRequest:
+      properties:
+        credential_id:
+          type: string
+          format: uuid
+          title: Credential Id
+        issuer_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Issuer Code
+      type: object
+      required:
+      - credential_id
+      title: CredentialVerifyRequest
+    CredentialVerifyResponse:
+      properties:
+        valid:
+          type: boolean
+          title: Valid
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/CredentialStatus'
+          - type: 'null'
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        student_identity_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Student Identity Id
+        credential_type:
+          anyOf:
+          - $ref: '#/components/schemas/CredentialType'
+          - type: 'null'
+      type: object
+      required:
+      - valid
+      title: CredentialVerifyResponse
+    DeviceCreate:
+      properties:
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+        device_type:
+          type: string
+          title: Device Type
+          default: mobile
+      type: object
+      required:
+      - school_id
+      - name
+      title: DeviceCreate
+    DeviceResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        name:
+          type: string
+          title: Name
+        device_type:
+          type: string
+          title: Device Type
+        status:
+          $ref: '#/components/schemas/DeviceStatus'
+        last_seen_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Seen At
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - school_id
+      - name
+      - device_type
+      - status
+      title: DeviceResponse
+    DeviceStatus:
+      type: string
+      enum:
+      - active
+      - suspended
+      - retired
+      title: DeviceStatus
+    EducationalEventCreate:
+      properties:
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        student_identity_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Student Identity Id
+        event_kind:
+          $ref: '#/components/schemas/EventKind'
+        occurred_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Occurred At
+        device_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Device Id
+        source:
+          type: string
+          title: Source
+          default: api
+        idempotency_key:
+          anyOf:
+          - type: string
+            maxLength: 128
+            pattern: ^[\w\-]{8,128}$
+          - type: 'null'
+          title: Idempotency Key
+        parent_event_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Event Id
+        payload:
+          additionalProperties: true
+          type: object
+          title: Payload
+      type: object
+      required:
+      - school_id
+      - event_kind
+      title: EducationalEventCreate
+    EducationalEventResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        seq:
+          type: integer
+          title: Seq
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        student_identity_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Student Identity Id
+        event_kind:
+          $ref: '#/components/schemas/EventKind'
+        occurred_at:
+          type: string
+          format: date-time
+          title: Occurred At
+        recorded_at:
+          type: string
+          format: date-time
+          title: Recorded At
+        device_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Device Id
+        source:
+          type: string
+          title: Source
+        idempotency_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency Key
+        parent_event_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Event Id
+        version:
+          type: integer
+          title: Version
+        payload:
+          additionalProperties: true
+          type: object
+          title: Payload
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - seq
+      - school_id
+      - event_kind
+      - occurred_at
+      - recorded_at
+      - source
+      - version
+      - payload
+      title: EducationalEventResponse
+    EventKind:
+      type: string
+      enum:
+      - check_in
+      - check_out
+      - lesson_started
+      - lesson_completed
+      - attendance_override
+      - credential_issued
+      - credential_verified
+      - sync_batch
+      title: EventKind
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HealthResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        version:
+          type: string
+          title: Version
+        database:
+          type: string
+          title: Database
+        checks:
+          additionalProperties: true
+          type: object
+          title: Checks
+      type: object
+      required:
+      - status
+      - version
+      - database
+      title: HealthResponse
+    IdentityCreate:
+      properties:
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        code:
+          type: string
+          maxLength: 64
+          minLength: 2
+          pattern: ^[a-zA-Z0-9_-]+$
+          title: Code
+        external_reference:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: External Reference
+        status:
+          $ref: '#/components/schemas/IdentityStatus'
+          default: active
+      type: object
+      required:
+      - school_id
+      - code
+      title: IdentityCreate
+    IdentityResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        code:
+          type: string
+          title: Code
+        external_reference:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: External Reference
+        status:
+          $ref: '#/components/schemas/IdentityStatus'
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - school_id
+      - code
+      - status
+      title: IdentityResponse
+    IdentityStatus:
+      type: string
+      enum:
+      - active
+      - suspended
+      - archived
+      title: IdentityStatus
+    IdentityUpdate:
+      properties:
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/IdentityStatus'
+          - type: 'null'
+        external_reference:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: External Reference
+      type: object
+      title: IdentityUpdate
+    MessageResponse:
+      properties:
+        message:
+          type: string
+          title: Message
+        details:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Details
+      type: object
+      required:
+      - message
+      title: MessageResponse
+    OrganizationCreate:
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        code:
+          type: string
+          maxLength: 64
+          minLength: 2
+          pattern: ^[a-zA-Z0-9_-]+$
+          title: Code
+        org_type:
+          $ref: '#/components/schemas/OrganizationType'
+          default: other
+        parent_organization_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Organization Id
+      type: object
+      required:
+      - name
+      - code
+      title: OrganizationCreate
+    OrganizationResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        name:
+          type: string
+          title: Name
+        code:
+          type: string
+          title: Code
+        org_type:
+          $ref: '#/components/schemas/OrganizationType'
+        status:
+          $ref: '#/components/schemas/RecordStatus'
+        parent_organization_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Organization Id
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - name
+      - code
+      - org_type
+      - status
+      title: OrganizationResponse
+    OrganizationType:
+      type: string
+      enum:
+      - school
+      - district
+      - nonprofit
+      - government
+      - other
+      title: OrganizationType
+    OrganizationUpdate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 200
+            minLength: 1
+          - type: 'null'
+          title: Name
+      type: object
+      title: OrganizationUpdate
+    PaginatedResponse_AuditLogResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AuditLogResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[AuditLogResponse]
+    PaginatedResponse_CredentialResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/CredentialResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[CredentialResponse]
+    PaginatedResponse_EducationalEventResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/EducationalEventResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[EducationalEventResponse]
+    PaginatedResponse_IdentityResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/IdentityResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[IdentityResponse]
+    PaginatedResponse_OrganizationResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/OrganizationResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[OrganizationResponse]
+    PaginatedResponse_SchoolResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/SchoolResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[SchoolResponse]
+    PaginatedResponse_UserResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[UserResponse]
+    RecordStatus:
+      type: string
+      enum:
+      - active
+      - suspended
+      - archived
+      title: RecordStatus
+    RefreshRequest:
+      properties:
+        refresh_token:
+          type: string
+          title: Refresh Token
+      type: object
+      required:
+      - refresh_token
+      title: RefreshRequest
+    SchoolCreate:
+      properties:
+        organization_id:
+          type: string
+          format: uuid
+          title: Organization Id
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        code:
+          type: string
+          maxLength: 64
+          minLength: 2
+          pattern: ^[a-zA-Z0-9_-]+$
+          title: Code
+      type: object
+      required:
+      - organization_id
+      - name
+      - code
+      title: SchoolCreate
+    SchoolResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        organization_id:
+          type: string
+          format: uuid
+          title: Organization Id
+        name:
+          type: string
+          title: Name
+        code:
+          type: string
+          title: Code
+        status:
+          $ref: '#/components/schemas/RecordStatus'
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - organization_id
+      - name
+      - code
+      - status
+      title: SchoolResponse
+    SyncDownloadRequest:
+      properties:
+        device_id:
+          type: string
+          format: uuid
+          title: Device Id
+        since_seq:
+          type: integer
+          title: Since Seq
+          default: 0
+        limit:
+          type: integer
+          maximum: 1000.0
+          minimum: 1.0
+          title: Limit
+          default: 200
+      type: object
+      required:
+      - device_id
+      title: SyncDownloadRequest
+    SyncDownloadResponse:
+      properties:
+        device_id:
+          type: string
+          format: uuid
+          title: Device Id
+        since_seq:
+          type: integer
+          title: Since Seq
+        watermark_after:
+          type: integer
+          title: Watermark After
+        records:
+          items:
+            $ref: '#/components/schemas/EducationalEventResponse'
+          type: array
+          title: Records
+        more:
+          type: boolean
+          title: More
+      type: object
+      required:
+      - device_id
+      - since_seq
+      - watermark_after
+      - records
+      - more
+      title: SyncDownloadResponse
+    SyncUploadRecord:
+      properties:
+        idempotency_key:
+          type: string
+          maxLength: 128
+          minLength: 8
+          pattern: ^[\w\-]+$
+          title: Idempotency Key
+        school_id:
+          type: string
+          format: uuid
+          title: School Id
+        student_identity_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Student Identity Id
+        event_kind:
+          $ref: '#/components/schemas/EventKind'
+        occurred_at:
+          type: string
+          format: date-time
+          title: Occurred At
+        device_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Device Id
+        source:
+          type: string
+          maxLength: 24
+          title: Source
+          default: offline_device
+        payload:
+          additionalProperties: true
+          type: object
+          title: Payload
+      type: object
+      required:
+      - idempotency_key
+      - school_id
+      - event_kind
+      - occurred_at
+      title: SyncUploadRecord
+    SyncUploadRequest:
+      properties:
+        device_id:
+          type: string
+          format: uuid
+          title: Device Id
+        batch_seq:
+          type: integer
+          minimum: 1.0
+          title: Batch Seq
+        records:
+          items:
+            $ref: '#/components/schemas/SyncUploadRecord'
+          type: array
+          minItems: 1
+          title: Records
+      type: object
+      required:
+      - device_id
+      - batch_seq
+      - records
+      title: SyncUploadRequest
+    SyncUploadResponse:
+      properties:
+        accepted:
+          type: integer
+          title: Accepted
+        duplicates:
+          type: integer
+          title: Duplicates
+        errors:
+          type: integer
+          title: Errors
+          default: 0
+        watermark_after:
+          type: integer
+          title: Watermark After
+        batch_id:
+          type: string
+          format: uuid
+          title: Batch Id
+        failed:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Failed
+      type: object
+      required:
+      - accepted
+      - duplicates
+      - watermark_after
+      - batch_id
+      title: SyncUploadResponse
+    UserCreate:
+      properties:
+        username:
+          type: string
+          maxLength: 64
+          minLength: 3
+          pattern: ^[a-zA-Z0-9_.-]+$
+          title: Username
+        password:
+          type: string
+          maxLength: 256
+          minLength: 8
+          title: Password
+        display_name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Display Name
+        role:
+          type: string
+          title: Role
+          default: operator
+        organization_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Organization Id
+        school_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: School Id
+      type: object
+      required:
+      - username
+      - password
+      - display_name
+      title: UserCreate
+    UserResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        username:
+          type: string
+          title: Username
+        display_name:
+          type: string
+          title: Display Name
+        role:
+          type: string
+          title: Role
+        status:
+          $ref: '#/components/schemas/RecordStatus'
+        organization_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Organization Id
+        school_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: School Id
+        last_login_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Login At
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - username
+      - display_name
+      - role
+      - status
+      title: UserResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

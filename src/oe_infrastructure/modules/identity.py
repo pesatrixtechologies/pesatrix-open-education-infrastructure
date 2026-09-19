@@ -32,9 +32,7 @@ from oe_infrastructure.modules.base import (
 
 class StudentIdentity(Base, UUIDPrimaryKeyMixin, CodeMixin, ReferenceMixin, TimestampMixin):
     __tablename__ = "student_identities"
-    __table_args__ = (
-        UniqueConstraint("school_id", "code", name="uq_student_school_code"),
-    )
+    __table_args__ = (UniqueConstraint("school_id", "code", name="uq_student_school_code"),)
 
     school_id: Mapped[Any] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("schools.id"), nullable=False, index=True

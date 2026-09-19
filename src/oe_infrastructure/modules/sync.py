@@ -35,7 +35,9 @@ class SyncDevice(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     status: Mapped[str] = mapped_column(String(24), nullable=False, default="active")
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     public_key: Mapped[str | None] = mapped_column(Text, nullable=True)
-    attributes: Mapped[dict[str, Any]] = mapped_column(JSON, name="metadata", nullable=False, default=dict)
+    attributes: Mapped[dict[str, Any]] = mapped_column(
+        JSON, name="metadata", nullable=False, default=dict
+    )
 
     def __repr__(self) -> str:
         return f"<SyncDevice name={self.name!r}>"

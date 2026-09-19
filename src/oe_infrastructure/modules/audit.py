@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import ForeignKey, String, Uuid
+from sqlalchemy import String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import JSON
 

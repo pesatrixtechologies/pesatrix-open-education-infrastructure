@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+import uuid
+from datetime import date, datetime
 from typing import Any
 
-import uuid
 from pydantic import BaseModel, ConfigDict, Field
 
 from oe_infrastructure.modules.enums import (
@@ -17,12 +17,11 @@ from oe_infrastructure.modules.enums import (
     IdentityStatus,
     OrganizationType,
     RecordStatus,
-    SyncDirection,
 )
 from oe_infrastructure.schemas import ORMModel, PaginatedResponse
 
-
 # --- Organizations -----------------------------------------------------------
+
 
 class OrganizationCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200)
@@ -45,6 +44,7 @@ class OrganizationResponse(ORMModel):
 
 # --- Schools -----------------------------------------------------------------
 
+
 class SchoolCreate(BaseModel):
     organization_id: uuid.UUID
     name: str = Field(min_length=1, max_length=200)
@@ -59,6 +59,7 @@ class SchoolResponse(ORMModel):
 
 
 # --- Identities ----------------------------------------------------------
+
 
 class IdentityCreate(BaseModel):
     school_id: uuid.UUID
@@ -80,6 +81,7 @@ class IdentityResponse(ORMModel):
 
 
 # --- Credentials ---------------------------------------------------------
+
 
 class CredentialCreate(BaseModel):
     student_identity_id: uuid.UUID
@@ -123,6 +125,7 @@ class CredentialVerifyResponse(BaseModel):
 
 # --- Events ------------------------------------------------------------------
 
+
 class EducationalEventCreate(BaseModel):
     school_id: uuid.UUID
     student_identity_id: uuid.UUID | None = None
@@ -130,9 +133,7 @@ class EducationalEventCreate(BaseModel):
     occurred_at: datetime | None = None
     device_id: uuid.UUID | None = None
     source: str = "api"
-    idempotency_key: str | None = Field(
-        default=None, max_length=128, pattern=r"^[\w\-]{8,128}$"
-    )
+    idempotency_key: str | None = Field(default=None, max_length=128, pattern=r"^[\w\-]{8,128}$")
     parent_event_id: uuid.UUID | None = None
     payload: dict[str, Any] = Field(default_factory=dict)
 
@@ -154,6 +155,7 @@ class EducationalEventResponse(ORMModel):
 
 # --- Attendance --------------------------------------------------------------
 
+
 class AttendanceRollupSchema(BaseModel):
     school_id: uuid.UUID
     date: str
@@ -165,7 +167,7 @@ class AttendanceRecordResponse(BaseModel):
     id: uuid.UUID
     school_id: uuid.UUID
     student_identity_id: uuid.UUID
-    date: str
+    date: date
     status: AttendanceStatus
     source_event_id: uuid.UUID | None = None
     derived_at: datetime
@@ -185,10 +187,11 @@ class AttendanceSummaryResponse(BaseModel):
     school_id: uuid.UUID
     date: str
     total_students: int
-    entries: AttendanceSummaryEntry
+    entries: list[AttendanceSummaryEntry]
 
 
 # --- Sync --------------------------------------------------------------------
+
 
 class DeviceCreate(BaseModel):
     school_id: uuid.UUID
@@ -246,6 +249,7 @@ class SyncDownloadResponse(BaseModel):
 
 # --- Auth --------------------------------------------------------------------
 
+
 class AuthTokenRequest(BaseModel):
     username: str = Field(min_length=1, max_length=64)
     password: str = Field(min_length=1, max_length=256)
@@ -283,6 +287,7 @@ class UserResponse(ORMModel):
 
 # --- Audit -------------------------------------------------------------------
 
+
 class AuditLogResponse(ORMModel):
     actor_type: str
     actor_id: str | None = None
@@ -297,12 +302,14 @@ class AuditLogResponse(ORMModel):
 
 # --- Common ------------------------------------------------------------------
 
+
 class MessageResponse(BaseModel):
     message: str
     details: dict[str, Any] | None = None
 
 
 # --- Health ------------------------------------------------------------------
+
 
 class HealthResponse(BaseModel):
     status: str

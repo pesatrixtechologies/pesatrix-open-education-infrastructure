@@ -14,7 +14,7 @@ sync engine for incremental downloads.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import (
@@ -23,8 +23,8 @@ from sqlalchemy import (
     ForeignKey,
     Identity,
     String,
-    Uuid,
     UniqueConstraint,
+    Uuid,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
@@ -61,7 +61,7 @@ class EducationalEvent(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     event_kind: Mapped[str] = mapped_column(String(40), nullable=False, index=True)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     recorded_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
     )
     device_id: Mapped[Any | None] = mapped_column(Uuid(as_uuid=True), nullable=True)
     source: Mapped[str] = mapped_column(String(24), nullable=False, default="api")

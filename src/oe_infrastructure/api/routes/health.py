@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
-
-from oe_infrastructure.core.deps import SessionDep
-from oe_infrastructure.core.rate_limit import RateLimitKey, rate_limit
-from oe_infrastructure.schemas.schemas import HealthResponse
+from fastapi import APIRouter
 
 from oe_infrastructure import __version__
-
+from oe_infrastructure.core.deps import SessionDep
+from oe_infrastructure.schemas.schemas import HealthResponse
 
 router = APIRouter()
 

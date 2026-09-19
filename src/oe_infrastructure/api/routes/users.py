@@ -1,4 +1,4 @@
-﻿"""User management routes."""
+"""User management routes."""
 
 from __future__ import annotations
 
@@ -30,10 +30,10 @@ async def create(
 ) -> UserResponse:
     try:
         role = Role(body.role)
-    except ValueError:
+    except ValueError as err:
         from oe_infrastructure.core.errors import ValidationFailure
 
-        raise ValidationFailure(f"Invalid role '{body.role}'", code="invalid_role")
+        raise ValidationFailure(f"Invalid role '{body.role}'", code="invalid_role") from err
     user = await create_user(
         session,
         username=body.username,
@@ -65,17 +65,15 @@ async def create(
 )
 async def list_users(
     session: SessionDep,
+    actor: UserDep,
     page: int = 1,
     size: int = 20,
 ) -> PaginatedUser:
-    query = (
-        select(User)
-        .order_by(User.created_at.desc())
-        .offset((page - 1) * size)
-        .limit(size)
-    )
+    query = select(User).order_by(User.created_at.desc()).offset((page - 1) * size).limit(size)
     total = await session.scalar(select(func.count()).select_from(User)) or 0
     result = await session.execute(query)
     users = result.scalars().all()
     items = [UserResponse.model_validate(u) for u in users]
-    return PaginatedUser(items=items, total=total, page=page, size=size, has_more=(page * size) < total)
+    return PaginatedUser(
+        items=items, total=total, page=page, size=size, has_more=(page * size) < total
+    )

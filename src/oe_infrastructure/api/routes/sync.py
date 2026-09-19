@@ -1,4 +1,4 @@
-﻿"""Synchronization routes (offline devices)."""
+"""Synchronization routes (offline devices)."""
 
 from __future__ import annotations
 
@@ -10,11 +10,11 @@ from oe_infrastructure.core.security import Role
 from oe_infrastructure.schemas.schemas import (
     DeviceCreate,
     DeviceResponse,
+    EducationalEventResponse,
     SyncDownloadRequest,
     SyncDownloadResponse,
     SyncUploadRequest,
     SyncUploadResponse,
-    EducationalEventResponse,
 )
 from oe_infrastructure.services.audit import audit
 from oe_infrastructure.services.sync import (
@@ -79,7 +79,11 @@ async def upload(
         resource_id=str(result["batch_id"]),
         actor_type="device",
         actor_id=str(body.device_id),
-        data={"accepted": result["accepted"], "duplicates": result["duplicates"], "errors": result["errors"]},
+        data={
+            "accepted": result["accepted"],
+            "duplicates": result["duplicates"],
+            "errors": result["errors"],
+        },
         client_ip=request.client.host if request.client else None,
     )
     await session.commit()

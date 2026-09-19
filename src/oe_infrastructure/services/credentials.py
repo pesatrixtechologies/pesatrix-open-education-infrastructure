@@ -14,7 +14,8 @@ verifiers additionally check issuance/revocation and expiry.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,26 +24,30 @@ from oe_infrastructure.config import get_settings
 from oe_infrastructure.core.crypto import HMACBuilder
 from oe_infrastructure.core.errors import ConflictError, NotFoundError
 from oe_infrastructure.modules.credentials import Credential
-from oe_infrastructure.modules.enums import CredentialStatus, CredentialType
+from oe_infrastructure.modules.enums import CredentialStatus
 from oe_infrastructure.modules.identity import StudentIdentity
 from oe_infrastructure.modules.organizations import Organization
 from oe_infrastructure.schemas.schemas import CredentialCreate
 
 
-def build_qr_payload(credential: Credential, issuer_code: str) -> dict:
-    payload: dict = {
+def build_qr_payload(credential: Credential, issuer_code: str) -> dict[str, Any]:
+    payload: dict[str, Any] = {
         "v": 1,
         "t": credential.credential_type,
         "id": str(credential.id),
         "iss": issuer_code,
-        "iat": int(credential.issued_at.timestamp()) if credential.issued_at else int(datetime.now(timezone.utc).timestamp()),
+        "iat": (
+            int(credential.issued_at.timestamp())
+            if credential.issued_at
+            else int(datetime.now(UTC).timestamp())
+        ),
     }
     if credential.expires_at is not None:
         payload["exp"] = int(credential.expires_at.timestamp())
     return payload
 
 
-def sign_qr_payload(payload: dict) -> str:
+def sign_qr_payload(payload: dict[str, Any]) -> str:
     builder = HMACBuilder(get_settings().secret_key)
     return builder.sign(payload)
 
@@ -60,8 +65,9 @@ async def issue_credential(
     if organization is None:
         raise NotFoundError("Organization", str(payload.issuer_organization_id))
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     credential = Credential(
+        id=uuid.uuid4(),
         student_identity_id=payload.student_identity_id,
         credential_type=payload.credential_type.value,
         title=payload.title,
@@ -113,7 +119,7 @@ async def revoke_credential(
     if credential.status == CredentialStatus.REVOKED.value:
         raise ConflictError("Credential already revoked", code="already_revoked")
     credential.status = CredentialStatus.REVOKED.value
-    credential.revoked_at = datetime.now(timezone.utc)
+    credential.revoked_at = datetime.now(UTC)
     credential.revoke_reason = reason
     return credential
 
@@ -147,7 +153,7 @@ async def verify_credential(
 
     if credential.status == CredentialStatus.REVOKED.value:
         return False, "revoked", credential
-    if credential.expires_at is not None and credential.expires_at < datetime.now(timezone.utc):
+    if credential.expires_at is not None and credential.expires_at < datetime.now(UTC):
         return False, "expired", credential
     if credential.status != CredentialStatus.ISSUED.value:
         return False, "unknown_status", credential

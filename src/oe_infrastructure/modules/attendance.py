@@ -17,10 +17,10 @@ Derivation rules (see ``services.attendance``):
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
-from sqlalchemy import Date, DateTime, ForeignKey, String, Uuid, UniqueConstraint
+from sqlalchemy import Date, DateTime, ForeignKey, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from oe_infrastructure.modules.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -50,7 +50,7 @@ class AttendanceRecord(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     status: Mapped[str] = mapped_column(String(16), nullable=False)
     source_event_id: Mapped[Any | None] = mapped_column(Uuid(as_uuid=True), nullable=True)
     derived_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
     )
 
     def __repr__(self) -> str:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,7 +37,7 @@ async def login(
     if user.status != RecordStatus.ACTIVE or not user.is_active:
         raise UnauthorizedError("Account is disabled")
 
-    user.last_login_at = datetime.now(timezone.utc)
+    user.last_login_at = datetime.now(UTC)
     await session.commit()
 
     access = create_access_token(
@@ -134,6 +134,6 @@ async def logout(
         TokenRevocation(
             jti=jti,
             user_id=uuid.UUID(user_id) if user_id else None,
-            expires_at=datetime.fromtimestamp(expires_at, tz=timezone.utc),
+            expires_at=datetime.fromtimestamp(expires_at, tz=UTC),
         )
     )

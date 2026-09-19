@@ -1,4 +1,4 @@
-﻿"""Student identity routes."""
+"""Student identity routes."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, Request
 
-from oe_infrastructure.core.deps import SessionDep, UserDep, require_role_at_least
+from oe_infrastructure.core.deps import SessionDep, require_role_at_least
 from oe_infrastructure.core.rate_limit import rate_limit
 from oe_infrastructure.core.security import Role
 from oe_infrastructure.schemas.schemas import (

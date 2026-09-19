@@ -39,20 +39,14 @@ class InMemoryRateLimiter:
     """Per-key token bucket limiter guarded by a lock."""
 
     def __init__(self) -> None:
-        self._buckets: dict[str, TokenBucket] = defaultdict(
-            lambda: TokenBucket(0, 0.0)
-        )
+        self._buckets: dict[str, TokenBucket] = defaultdict(lambda: TokenBucket(0, 0.0))
         self._lock = Lock()
         self._last_prune = time.monotonic()
 
     def _prune(self) -> None:
         now = time.monotonic()
         if now - self._last_prune > 300:
-            stale = [
-                key
-                for key, bucket in self._buckets.items()
-                if now - bucket.updated_at > 900
-            ]
+            stale = [key for key, bucket in self._buckets.items() if now - bucket.updated_at > 900]
             for key in stale:
                 self._buckets.pop(key, None)
             self._last_prune = now
