@@ -1,0 +1,33 @@
+# ============================================================================
+# PESATRIX Open Education Infrastructure
+# ============================================================================
+
+PESATRIX TECHNOLOGIES SARL
+Copyright 2026 PESATRIX TECHNOLOGIES SARL
+
+This product includes software developed as an open-source public-good
+technology initiative. It is licensed under the Apache License, Version 2.0
+(see LICENSE).
+
+## Third-party notices
+
+This project depends on third-party open-source libraries. See the
+individual package licenses for full details. The most notable are:
+
+- FastAPI (MIT)
+- SQLAlchemy (MIT)
+- Pydantic (MIT)
+- PyJWT (MIT)
+- cryptography (Apache-2.0 OR BSD-3-Clause)
+- passlib (BSD-3-Clause)
+- qrcode (BSD-3-Clause)
+- Alembic (MIT)
+- Uvicorn (BSD-3-Clause)
+
+## Attribution
+
+This project is developed by PESATRIX TECHNOLOGIES SARL (https://www.pesatrix.com)
+as part of a proposed open-source technology initiative. The project is an
+independent, community-oriented, open-source infrastructure effort. It is not
+an endorsement by, partnership with, or funding from any third party,
+including UNICEF, unless explicitly documented otherwise.

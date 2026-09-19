@@ -1,0 +1,41 @@
+# Dependencies
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Environment — never commit real secrets
+.env
+.env.*
+!.env.example
+
+# Testing / tooling
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.bandit
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated artifacts
+schemas/openapi.json
+*.png
+!docs/assets/*.png
+!assets/**/*.png

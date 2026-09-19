@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: oe-infra-db
+    environment:
+      POSTGRES_USER: oe
+      POSTGRES_PASSWORD: oe
+      POSTGRES_DB: oe
+    ports:
+      - "5432:5432"
+    volumes:
+      - oe_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oe -d oe"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    container_name: oe-infra-api
+    env_file:
+      - .env
+    environment:
+      OE_DATABASE_URL: postgresql+asyncpg://oe:oe@db:5432/oe
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn oe_infrastructure.main:create_app --factory --host 0.0.0.0 --port 8000"
+
+volumes:
+  oe_pgdata:
