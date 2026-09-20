@@ -10,37 +10,6 @@ from __future__ import annotations
 from enum import Enum
 
 
-class Role(str, Enum):
-    PLATFORM_ADMIN = "platform_admin"
-    ORG_ADMIN = "org_admin"
-    SCHOOL_ADMIN = "school_admin"
-    OPERATOR = "operator"
-    VERIFIER = "verifier"
-    DEVELOPER = "developer"
-
-
-class RoleAtLeast:
-    """Strictly increasing role ladder for hierarchy checks."""
-
-    _LADDER = (
-        Role.DEVELOPER,
-        Role.VERIFIER,
-        Role.OPERATOR,
-        Role.SCHOOL_ADMIN,
-        Role.ORG_ADMIN,
-        Role.PLATFORM_ADMIN,
-    )
-
-    @classmethod
-    def index(cls, role: Role) -> int:
-        return cls._LADDER.index(role)
-
-    @classmethod
-    def at_least(cls, required: Role) -> tuple[Role, ...]:
-        i = cls.index(required)
-        return cls._LADDER[i:]
-
-
 class RecordStatus(str, Enum):
     ACTIVE = "active"
     SUSPENDED = "suspended"
