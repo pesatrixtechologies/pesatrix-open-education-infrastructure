@@ -76,9 +76,6 @@ async def seed() -> dict[str, str]:
 
 
 async def _main() -> None:
-    from oe_infrastructure.database import init_schema
-
-    await init_schema()
     result = await seed()
     print("Seeded synthetic demo data:")
     for key, value in result.items():

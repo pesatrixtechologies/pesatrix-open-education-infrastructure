@@ -6,9 +6,9 @@ Usage::
 
 Imports every module in ``oe_infrastructure`` and reports which ones fail to
 import, so broken intra-package references are caught in one pass instead of
-wandering builds. Designed to be fast and dependency-light (only needs the
-package installed plus a live environment variable ``OE_INFRA_DATABASE_URL``
-if database-backed modules are to be exercised; those are skipped otherwise).
+wandering builds. Designed to be fast and dependency-light: importing a module
+does not connect to the database, so no live services are required. The
+``OE_DATABASE_URL`` flag in the output is informational only.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from pathlib import Path
 SRC = Path(__file__).resolve().parents[1] / "src"
 sys.path.insert(0, str(SRC))
 
-HAS_DB_URL = bool(os.environ.get("OE_INFRA_DATABASE_URL"))
+HAS_DB_URL = bool(os.environ.get("OE_DATABASE_URL"))
 
 
 def discover_modules() -> list[str]:

@@ -81,6 +81,6 @@ Production startup validates that insecure defaults are not used.
 
 - [Credentials and QR](credentials.md)
 - [Offline synchronization](sync.md)
-- [Deployment](deployment.md)
+- [Deployment](../deployment.md)
 - [Threat model](../security/threat-model.md)
 - [Privacy by design](../privacy/privacy-by-design.md)

@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
+    # The schema is owned by Alembic (`alembic upgrade head`), not by the app.
+    # Only the development bootstrap admin is created here; production admin
+    # accounts are provisioned explicitly via `oe-infra create-admin`.
     if not settings.is_production:
-        from oe_infrastructure.database import init_schema
-
-        await init_schema()
         async with SessionLocal() as session:
             await bootstrap_admin(session)
             await session.commit()

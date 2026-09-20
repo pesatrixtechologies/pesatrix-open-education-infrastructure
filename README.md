@@ -1,5 +1,9 @@
 # PESATRIX Open Education Infrastructure
 
+[![CI](https://github.com/pesatrixtechologies/pesatrix-open-education-infrastructure/actions/workflows/ci.yml/badge.svg)](https://github.com/pesatrixtechologies/pesatrix-open-education-infrastructure/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
+
 > Reusable, secure, interoperable digital infrastructure for structured
 > educational events and information in low-resource environments.
 
